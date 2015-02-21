@@ -31,20 +31,11 @@
 #define PRINT_TYPE(typ) PlatformPrintf(Parser->pc->CStdOut, "%t\n", typ);
 
 /* small processors use a simplified FILE * for stdio, otherwise use the system FILE * */
-#ifdef BUILTIN_MINI_STDLIB
-typedef struct OutputStream IOFILE;
-#else
 typedef FILE IOFILE;
-#endif
 
 /* coercion of numeric types to other numeric types */
-#ifndef NO_FP
 #define IS_FP(v) ((v)->Typ->Base == TypeFP)
 #define FP_VAL(v) ((v)->Val->FP)
-#else
-#define IS_FP(v) 0
-#define FP_VAL(v) 0
-#endif
 
 #define IS_POINTER_COERCIBLE(v, ap) ((ap) ? ((v)->Typ->Base == TypePointer) : 0)
 #define POINTER_COERCE(v) ((int)(v)->Val->Pointer)
@@ -142,9 +133,7 @@ enum BaseType
     TypeUnsignedShort,          /* unsigned short integer */
     TypeUnsignedChar,           /* unsigned 8-bit number */ /* must be before unsigned long */
     TypeUnsignedLong,           /* unsigned long integer */
-#ifndef NO_FP
     TypeFP,                     /* floating point */
-#endif
     TypeFunction,               /* a function */
     TypeMacro,                  /* a macro */
     TypePointer,                /* a pointer */
@@ -208,9 +197,7 @@ union AnyValue
     struct ValueType *Typ;
     struct FuncDef FuncDef;
     struct MacroDef MacroDef;
-#ifndef NO_FP
     double FP;
-#endif
     void *Pointer;                  /* unsafe native pointers */
 };
 
@@ -409,9 +396,7 @@ struct Picoc_Struct
     struct ValueType UnsignedShortType;
     struct ValueType UnsignedLongType;
     struct ValueType UnsignedCharType;
-    #ifndef NO_FP
     struct ValueType FPType;
-    #endif
     struct ValueType VoidType;
     struct ValueType TypeType;
     struct ValueType FunctionType;
@@ -489,9 +474,7 @@ long ExpressionParseInt(struct ParseState *Parser);
 void ExpressionAssign(struct ParseState *Parser, struct Value *DestValue, struct Value *SourceValue, int Force, const char *FuncName, int ParamNo, int AllowPointerCoercion);
 long ExpressionCoerceInteger(struct Value *Val);
 unsigned long ExpressionCoerceUnsignedInteger(struct Value *Val);
-#ifndef NO_FP
 double ExpressionCoerceFP(struct Value *Val);
-#endif
 
 /* type.c */
 void TypeInit(Picoc *pc);

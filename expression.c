@@ -174,9 +174,7 @@ long ExpressionCoerceInteger(struct Value *Val)
         case TypeUnsignedLong:    return (long)Val->Val->UnsignedLongInteger;
         case TypeUnsignedChar:    return (long)Val->Val->UnsignedCharacter;
         case TypePointer:         return (long)Val->Val->Pointer;
-#ifndef NO_FP
         case TypeFP:              return (long)Val->Val->FP;
-#endif
         default:                  return 0;
     }
 }
@@ -194,14 +192,11 @@ unsigned long ExpressionCoerceUnsignedInteger(struct Value *Val)
         case TypeUnsignedLong:    return (unsigned long)Val->Val->UnsignedLongInteger;
         case TypeUnsignedChar:    return (unsigned long)Val->Val->UnsignedCharacter;
         case TypePointer:         return (unsigned long)Val->Val->Pointer;
-#ifndef NO_FP
         case TypeFP:              return (unsigned long)Val->Val->FP;
-#endif
         default:                  return 0;
     }
 }
 
-#ifndef NO_FP
 double ExpressionCoerceFP(struct Value *Val)
 {
 #ifndef BROKEN_FLOAT_CASTS
@@ -237,7 +232,6 @@ double ExpressionCoerceFP(struct Value *Val)
     }
 #endif
 }
-#endif
 
 /* assign an integer value */
 long ExpressionAssignInt(struct ParseState *Parser, struct Value *DestValue, long FromInt, int After)
@@ -267,7 +261,6 @@ long ExpressionAssignInt(struct ParseState *Parser, struct Value *DestValue, lon
     return Result;
 }
 
-#ifndef NO_FP
 /* assign a floating point value */
 double ExpressionAssignFP(struct ParseState *Parser, struct Value *DestValue, double FromFP)
 {
@@ -277,7 +270,6 @@ double ExpressionAssignFP(struct ParseState *Parser, struct Value *DestValue, do
     DestValue->Val->FP = FromFP;
     return FromFP;
 }
-#endif
 
 /* push a node on to the expression stack */
 void ExpressionStackPushValueNode(struct ParseState *Parser, struct ExpressionStack **StackTop, struct Value *ValueLoc)
@@ -340,14 +332,12 @@ void ExpressionPushInt(struct ParseState *Parser, struct ExpressionStack **Stack
     ExpressionStackPushValueNode(Parser, StackTop, ValueLoc);
 }
 
-#ifndef NO_FP
 void ExpressionPushFP(struct ParseState *Parser, struct ExpressionStack **StackTop, double FPValue)
 {
     struct Value *ValueLoc = VariableAllocValueFromType(Parser->pc, Parser, &Parser->pc->FPType, FALSE, NULL, FALSE);
     ValueLoc->Val->FP = FPValue;
     ExpressionStackPushValueNode(Parser, StackTop, ValueLoc);
 }
-#endif
 
 /* assign to a pointer */
 void ExpressionAssignToPointer(struct ParseState *Parser, struct Value *ToValue, struct Value *FromValue, const char *FuncName, int ParamNo, int AllowPointerCoercion)
@@ -407,14 +397,12 @@ void ExpressionAssign(struct ParseState *Parser, struct Value *DestValue, struct
         case TypeUnsignedLong:  DestValue->Val->UnsignedLongInteger = ExpressionCoerceUnsignedInteger(SourceValue); break;
         case TypeUnsignedChar:  DestValue->Val->UnsignedCharacter = (unsigned char)ExpressionCoerceUnsignedInteger(SourceValue); break;
 
-#ifndef NO_FP
         case TypeFP:
             if (!IS_NUMERIC_COERCIBLE_PLUS_POINTERS(SourceValue, AllowPointerCoercion)) 
                 AssignFail(Parser, "%t from %t", DestValue->Typ, SourceValue->Typ, 0, 0, FuncName, ParamNo); 
             
             DestValue->Val->FP = ExpressionCoerceFP(SourceValue);
             break;
-#endif
         case TypePointer:
             ExpressionAssignToPointer(Parser, DestValue, SourceValue, FuncName, ParamNo, AllowPointerCoercion);
             break;
@@ -546,7 +534,6 @@ void ExpressionPrefixOperator(struct ParseState *Parser, struct ExpressionStack 
         
         default:
             /* an arithmetic operator */
-#ifndef NO_FP
             if (TopValue->Typ == &Parser->pc->FPType)
             {
                 /* floating point prefix arithmetic */
@@ -565,7 +552,6 @@ void ExpressionPrefixOperator(struct ParseState *Parser, struct ExpressionStack 
                 ExpressionPushFP(Parser, StackTop, ResultFP);
             }
             else 
-#endif
             if (IS_NUMERIC_COERCIBLE(TopValue))
             {
                 /* integer prefix arithmetic */
@@ -618,7 +604,6 @@ void ExpressionPrefixOperator(struct ParseState *Parser, struct ExpressionStack 
 void ExpressionPostfixOperator(struct ParseState *Parser, struct ExpressionStack **StackTop, enum LexToken Op, struct Value *TopValue)
 {
     debugf("ExpressionPostfixOperator()\n");
-#ifndef NO_FP
     if (TopValue->Typ == &Parser->pc->FPType)
     {
         /* floating point prefix arithmetic */
@@ -634,7 +619,6 @@ void ExpressionPostfixOperator(struct ParseState *Parser, struct ExpressionStack
         ExpressionPushFP(Parser, StackTop, ResultFP);
     }
     else 
-#endif
     if (IS_NUMERIC_COERCIBLE(TopValue))
     {
         long ResultInt = 0;
@@ -715,7 +699,6 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
     else if (Op == TokenColon)
         ExpressionColonOperator(Parser, StackTop, TopValue, BottomValue);
         
-#ifndef NO_FP
     else if ( (TopValue->Typ == &Parser->pc->FPType && BottomValue->Typ == &Parser->pc->FPType) ||
               (TopValue->Typ == &Parser->pc->FPType && IS_NUMERIC_COERCIBLE(BottomValue)) ||
               (IS_NUMERIC_COERCIBLE(TopValue) && BottomValue->Typ == &Parser->pc->FPType) )
@@ -751,7 +734,6 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
         else
             ExpressionPushFP(Parser, StackTop, ResultFP);
     }
-#endif
     else if (IS_NUMERIC_COERCIBLE(TopValue) && IS_NUMERIC_COERCIBLE(BottomValue))
     { 
         /* integer operation */
@@ -1367,11 +1349,7 @@ void ExpressionParseMacroCall(struct ParseState *Parser, struct ExpressionStack 
     if (Parser->Mode == RunModeRun) 
     { 
         /* create a stack frame for this macro */
-#ifndef NO_FP
         ExpressionStackPushValueByType(Parser, StackTop, &Parser->pc->FPType);  /* largest return type there is */
-#else
-        ExpressionStackPushValueByType(Parser, StackTop, &Parser->pc->IntType);  /* largest return type there is */
-#endif
         ReturnValue = (*StackTop)->Val;
         HeapPushStackFrame(Parser->pc);
         ParamArray = HeapAllocStack(Parser->pc, sizeof(struct Value *) * MDef->NumParams);    

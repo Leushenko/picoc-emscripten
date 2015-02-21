@@ -2,7 +2,6 @@
 #include <time.h>
 #include "../interpreter.h"
 
-#ifndef BUILTIN_MINI_STDLIB
 
 static int CLOCKS_PER_SECValue = CLOCKS_PER_SEC;
 
@@ -29,12 +28,10 @@ void StdCtime(struct ParseState *Parser, struct Value *ReturnValue, struct Value
     ReturnValue->Val->Pointer = ctime(Param[0]->Val->Pointer);
 }
 
-#ifndef NO_FP
 void StdDifftime(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->FP = difftime((time_t)Param[0]->Val->Integer, Param[1]->Val->Integer);
 }
-#endif
 
 void StdGmtime(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
@@ -92,9 +89,7 @@ struct LibraryFunction StdTimeFunctions[] =
     { StdAsctime,       "char *asctime(struct tm *);" },
     { StdClock,         "time_t clock();" },
     { StdCtime,         "char *ctime(int *);" },
-#ifndef NO_FP
     { StdDifftime,      "double difftime(int, int);" },
-#endif
     { StdGmtime,        "struct tm *gmtime(int *);" },
     { StdLocaltime,     "struct tm *localtime(int *);" },
     { StdMktime,        "int mktime(struct tm *ptm);" },
@@ -125,4 +120,3 @@ void StdTimeSetupFunc(Picoc *pc)
 #endif
 }
 
-#endif /* !BUILTIN_MINI_STDLIB */

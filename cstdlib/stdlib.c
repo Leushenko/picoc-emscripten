@@ -1,16 +1,13 @@
 /* stdlib.h library for large systems - small embedded systems use clibrary.c instead */
 #include "../interpreter.h"
 
-#ifndef BUILTIN_MINI_STDLIB
 
 static int Stdlib_ZeroValue = 0;
 
-#ifndef NO_FP
 void StdlibAtof(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->FP = atof(Param[0]->Val->Pointer);
 }
-#endif
 
 void StdlibAtoi(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
@@ -22,12 +19,10 @@ void StdlibAtol(struct ParseState *Parser, struct Value *ReturnValue, struct Val
     ReturnValue->Val->Integer = atol(Param[0]->Val->Pointer);
 }
 
-#ifndef NO_FP
 void StdlibStrtod(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->FP = strtod(Param[0]->Val->Pointer, Param[1]->Val->Pointer);
 }
-#endif
 
 void StdlibStrtol(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
@@ -134,10 +129,8 @@ typedef struct { \
 /* all stdlib.h functions */
 struct LibraryFunction StdlibFunctions[] =
 {
-#ifndef NO_FP
     { StdlibAtof,           "float atof(char *);" },
     { StdlibStrtod,         "float strtod(char *,char **);" },
-#endif
     { StdlibAtoi,           "int atoi(char *);" },
     { StdlibAtol,           "int atol(char *);" },
     { StdlibStrtol,         "int strtol(char *,char **,int);" },
@@ -171,4 +164,3 @@ void StdlibSetupFunc(Picoc *pc)
         VariableDefinePlatformVar(pc, NULL, "NULL", &pc->IntType, (union AnyValue *)&Stdlib_ZeroValue, FALSE);
 }
 
-#endif /* !BUILTIN_MINI_STDLIB */

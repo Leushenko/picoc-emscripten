@@ -1,8 +1,6 @@
 /* stdio.h library for large systems - small embedded systems use clibrary.c instead */
 #include "../interpreter.h"
 
-#ifndef BUILTIN_MINI_STDLIB
-#ifndef NO_FP
 
 static double M_EValue =        2.7182818284590452354;   /* e */
 static double M_LOG2EValue =    1.4426950408889634074;   /* log_2 e */
@@ -183,5 +181,3 @@ void MathSetupFunc(Picoc *pc)
     VariableDefinePlatformVar(pc, NULL, "M_SQRT1_2", &pc->FPType, (union AnyValue *)&M_SQRT1_2Value, FALSE);
 }
 
-#endif /* !NO_FP */
-#endif /* !BUILTIN_MINI_STDLIB */

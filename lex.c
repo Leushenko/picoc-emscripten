@@ -51,15 +51,11 @@ static struct ReservedWord ReservedWords[] =
     { "default", TokenDefault },
     { "delete", TokenDelete },
     { "do", TokenDo },
-#ifndef NO_FP
     { "double", TokenDoubleType },
-#endif
     { "else", TokenElse },
     { "enum", TokenEnumType },
     { "extern", TokenExternType },
-#ifndef NO_FP
     { "float", TokenFloatType },
-#endif
     { "for", TokenFor },
     { "goto", TokenGoto },
     { "if", TokenIf },
@@ -132,10 +128,8 @@ enum LexToken LexGetNumber(Picoc *pc, struct LexState *Lexer, struct Value *Valu
     long Result = 0;
     long Base = 10;
     enum LexToken ResultToken;
-#ifndef NO_FP
     double FPResult;
     double FPDiv;
-#endif
     /* long/unsigned flags */
 #if 0 /* unused for now */
     char IsLong = 0;
@@ -180,7 +174,6 @@ enum LexToken LexGetNumber(Picoc *pc, struct LexState *Lexer, struct Value *Valu
     if (Lexer->Pos == Lexer->End)
         return ResultToken;
         
-#ifndef NO_FP
     if (Lexer->Pos == Lexer->End)
     {
         return ResultToken;
@@ -230,9 +223,6 @@ enum LexToken LexGetNumber(Picoc *pc, struct LexState *Lexer, struct Value *Valu
         LEXER_INC(Lexer);
 
     return TokenFPConstant;
-#else
-    return ResultToken;
-#endif
 }
 
 /* get a reserved word or identifier - used while scanning */
@@ -720,9 +710,7 @@ enum LexToken LexGetRawToken(struct ParseState *Parser, struct Value **Value, in
                 case TokenIdentifier:           pc->LexValue.Typ = NULL; break;
                 case TokenIntegerConstant:      pc->LexValue.Typ = &pc->LongType; break;
                 case TokenCharacterConstant:    pc->LexValue.Typ = &pc->CharType; break;
-#ifndef NO_FP
                 case TokenFPConstant:           pc->LexValue.Typ = &pc->FPType; break;
-#endif
                 default: break;
             }
             
