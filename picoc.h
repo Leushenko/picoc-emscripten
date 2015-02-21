@@ -4,11 +4,7 @@
 #define PICOC_H
 
 /* picoc version number */
-#ifdef VER
-#define PICOC_VERSION "v2.2 beta r" VER         /* VER is the subversion version number, obtained via the Makefile */
-#else
-#define PICOC_VERSION "v2.2"
-#endif
+#define PICOC_VERSION "v2.2-emscripten"
 
 /* handy definitions */
 #ifndef TRUE

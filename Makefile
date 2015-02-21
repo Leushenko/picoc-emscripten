@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -pedantic -g -DUNIX_HOST -DVER=\"`svnversion -n`\"
-LIBS=-lm -lreadline
+CFLAGS=-Wall -pedantic -g -DUNIX_HOST
+LIBS=-lm
 
 TARGET	= picoc
 SRCS	= picoc.c table.c lex.c parse.c expression.c heap.c type.c \
