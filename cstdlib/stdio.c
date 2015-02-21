@@ -679,13 +679,13 @@ void StdioSetupFunc(Picoc *pc)
     struct ValueType *FilePtrType;
 
     /* make a "struct __FILEStruct" which is the same size as a native FILE structure */
-    StructFileType = TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "__FILEStruct"), sizeof(FILE));
+    StructFileType = TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "__FILEStruct"), 8);/*sizeof(FILE));*/
     
     /* get a FILE * type */
     FilePtrType = TypeGetMatching(pc, NULL, StructFileType, TypePointer, 0, pc->StrEmpty, TRUE);
 
     /* make a "struct __va_listStruct" which is the same size as our struct StdVararg */
-    TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "__va_listStruct"), sizeof(FILE));
+    TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "__va_listStruct"), sizeof(struct StdVararg));
     
     /* define EOF equal to the system EOF */
     VariableDefinePlatformVar(pc, NULL, "EOF", &pc->IntType, (union AnyValue *)&EOFValue, FALSE);
