@@ -1,8 +1,8 @@
-CC=gcc
-CFLAGS=-Wall -pedantic -g -DUNIX_HOST
-LIBS=-lm
+CC=emcc
+CFLAGS=-Wall -pedantic -g0 -O2
+LIBS=
 
-TARGET	= picoc
+TARGET	= picoc.html
 SRCS	= picoc.c table.c lex.c parse.c expression.c heap.c type.c \
 	variable.c clibrary.c platform.c include.c debug.c \
 	platform/platform_unix.c platform/library_unix.c \
@@ -20,7 +20,7 @@ test:	all
 	(cd tests; make test)
 
 clean:
-	rm -f $(TARGET) $(OBJS) *~
+	rm -f $(TARGET) $(OBJS) picoc.html.mem picoc.js
 
 count:
 	@echo "Core:"
